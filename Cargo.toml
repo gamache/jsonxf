@@ -1,0 +1,16 @@
+[package]
+name = "jsonpp"
+version = "0.5.0"
+authors = ["pete gamache <pete@gamache.org>"]
+
+[dependencies]
+getopts = "0.2"
+
+[lib]
+name = "jsonpp"
+path = "src/jsonpp.rs"
+
+[[bin]]
+name = "jsonpp"
+path = "src/main.rs"
+
