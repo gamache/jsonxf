@@ -1,5 +1,5 @@
 [package]
-name = "jsonpp"
+name = "jsonxf"
 version = "0.5.0"
 authors = ["pete gamache <pete@gamache.org>"]
 
@@ -7,10 +7,11 @@ authors = ["pete gamache <pete@gamache.org>"]
 getopts = "0.2"
 
 [lib]
-name = "jsonpp"
-path = "src/jsonpp.rs"
+name = "jsonxf"
+path = "src/jsonxf.rs"
 
 [[bin]]
-name = "jsonpp"
+name = "jsonxf"
 path = "src/main.rs"
+doc = false
 

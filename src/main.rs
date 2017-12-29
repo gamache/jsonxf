@@ -1,27 +1,25 @@
-use std::env;
-use std::io;
-use std::io::prelude::*;
-use std::io::BufReader;
-use std::io::BufWriter;
-use std::io::Error;
+/*
+  Jsonxf: a fast JSON pretty-printer and minimizer.
+   ,
+  (k) 2017-2018 pete gamache <pete@gamache.org>
+
+  Jsonxf does not hold strong opinions on JSON validity or text encoding,
+  aside from that input must be 7-8 bits wide, e.g. ASCII or UTF-8.
+  It is designed for speed.
+*/
+
 use std::fs::File;
 
-extern crate jsonpp;
-use jsonpp::pp;
-use jsonpp::minimize;
+extern crate jsonxf;
+use jsonxf::pretty_print;
+use jsonxf::minimize;
 
 extern crate getopts;
 use getopts::Options;
 
 
-/*
-  A JSON pretty-printer and minimizer.  Pretty fast.
-  Does not hold strong opinions on JSON validity.
-  Input should be ASCII or UTF-8; other encodings are not guaranteed to work.
-*/
-
 fn main() {
-  let args: Vec<String> = env::args().collect();
+  let args: Vec<String> = std::env::args().collect();
   let program = args[0].clone();
 
   let mut opts = Options::new();
@@ -29,7 +27,7 @@ fn main() {
   opts.optopt("o", "output", "write output to the given file (default: STDOUT)", "file");
   opts.optopt("t", "tab", "use the given string to indent pretty-printed output (default: two spaces)", "tabstr");
   opts.optflag("m", "minimize", "minimize JSON instead of pretty-printing it");
-  opts.optflag("h", "help", "print this help message");
+  opts.optflag("h", "help", "print this message");
 
   let matches = match opts.parse(&args[1..]) {
     Ok(m) => { m },
@@ -41,11 +39,11 @@ fn main() {
     return;
   }
 
-  let mut input: Box<io::Read> = match matches.opt_str("i") {
-    None => { Box::new(io::stdin()) },
+  let mut input: Box<std::io::Read> = match matches.opt_str("i") {
+    None => { Box::new(std::io::stdin()) },
     Some(filename) => {
       if filename == "-".to_owned() {
-        Box::new(io::stdin())
+        Box::new(std::io::stdin())
       }
       else {
         match File::open(filename) {
@@ -56,11 +54,11 @@ fn main() {
     },
   };
 
-  let mut output: Box<io::Write> = match matches.opt_str("o") {
-    None => { Box::new(io::stdout()) },
+  let mut output: Box<std::io::Write> = match matches.opt_str("o") {
+    None => { Box::new(std::io::stdout()) },
     Some(filename) => {
       if filename == "-".to_owned() {
-        Box::new(io::stdout())
+        Box::new(std::io::stdout())
       }
       else {
         match File::create(filename) {
@@ -80,7 +78,7 @@ fn main() {
     minimize(&mut input, &mut output)
   }
   else {
-    pp(&mut input, &mut output, &indent)
+    pretty_print(&mut input, &mut output, &indent)
   };
 
   match result {

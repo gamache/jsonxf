@@ -4,8 +4,8 @@ version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "jsonpp"
-version = "1.0.0"
+name = "jsonxf"
+version = "0.5.0"
 dependencies = [
  "getopts 0.2.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
