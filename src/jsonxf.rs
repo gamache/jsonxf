@@ -9,6 +9,9 @@
 //! `jsonxf` command-line tool.  Run `jsonxf -h` to see configuration
 //! options.
 //!
+//! GitHub:
+//! <a href="https://github.com/gamache/jsonxf" target="_blank">gamache/jsonxf</a>
+//!
 
 use std::io::prelude::*;
 use std::io::BufReader;

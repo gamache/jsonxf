@@ -50,7 +50,7 @@ several of its counterparts: [jsonpp](https://github.com/jmhodges/jsonpp)
 and [jq](https://stedolan.github.io/jq/).  `cat` is thrown in as well,
 for scale.
 
-Test platform: MBP (early 2013), 3GHz i7, 8GB RAM.
+Test platform: MBP (early 2013), macOS 10.12.6, 3GHz i7, 8GB RAM.
 
 Pretty-print test, 600MB minimized input (1M objects):
 
