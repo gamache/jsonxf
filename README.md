@@ -5,7 +5,8 @@ A JSON transformer, written in Rust.
 Provides fast pretty-printing and minimizing of JSON-encoded strings
 and streams, at the command line or within Rust programs.
 
-Crate docs: https://docs.rs/jsonxf/0.5.0/jsonxf/
+Crate docs: https://docs.rs/jsonxf/
+
 
 ## Installation
 

@@ -1,6 +1,6 @@
 [package]
 name = "jsonxf"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["pete gamache <pete@gamache.org>"]
 description = "A fast JSON pretty-printer and minimizer."
 homepage = "https://github.com/gamache/jsonxf"
@@ -8,7 +8,6 @@ repository = "https://github.com/gamache/jsonxf"
 keywords = ["json", "pretty-print", "pretty", "minimize"]
 categories = ["encoding", "rendering", "text-processing", "value-formatting"]
 license = "MIT"
-license-file = "MIT-LICENSE.txt"
 
 [dependencies]
 getopts = "0.2"

@@ -22,7 +22,7 @@ use getopts::Options;
 
 fn main() {
   match do_main() {
-    Ok(_) => { },
+    Ok(_) => { /* YAY */ },
     Err(e) => {
       eprintln!("{}", e);
       std::process::exit(1);
@@ -35,6 +35,7 @@ fn do_main() -> Result<(), String> {
 
   let mut opts = Options::new();
   opts.optopt("i", "input", "read input from the given file (default: STDIN)", "file");
+  opts.optopt("s", "string", "use the given string as input", "str");
   opts.optopt("o", "output", "write output to the given file (default: STDOUT)", "file");
   opts.optopt("t", "tab", "use the given string to indent pretty-printed output (default: two spaces)", "tabstr");
   opts.optflag("m", "minimize", "minimize JSON instead of pretty-printing it");
@@ -53,9 +54,18 @@ fn do_main() -> Result<(), String> {
     return Ok(());
   }
 
+  let mut input_str = String::from("");
   let mut input: Box<std::io::Read> = match matches.opt_str("i") {
     None => {
-      Box::new(std::io::stdin())
+      match matches.opt_str("s") {
+        None => {
+          Box::new(std::io::stdin())
+        },
+        Some(json_str) => {
+          input_str.push_str(&json_str);
+          Box::new(input_str.as_bytes())
+        }
+      }
     },
     Some(filename) => {
       if filename == "-".to_owned() {
@@ -101,7 +111,7 @@ fn do_main() -> Result<(), String> {
     },
   };
 
-  let indent: String = match matches.opt_str("t") {
+  let indent = match matches.opt_str("t") {
     None => { String::from("  ") },
     Some(string) => { string.clone() },
   };
@@ -122,17 +132,24 @@ fn do_main() -> Result<(), String> {
 fn print_help(program_name: &str, opts: &Options) -> () {
   let desc =
 "Jsonxf is a JSON transformer.  It provides fast pretty-printing and
-minimizing of JSON-encoded UTF-8 data.
+minimizing of JSON-encoded UTF-8 data.";
 
-Pretty-print example:
+  let examples = "
+Minimize a file:
+
+    jsonxf -m <foo.json >foo-min.json
+
+Pretty-print a file, using two spaces to indent:
 
     jsonxf <foo.json >foo-pretty.json
 
-Minimize example:
+Pretty-print a string, using a tab character to indent:
 
-    jsonxf -m <foo.json >foo-min.json";
+    jsonxf -s '{\"a\": {\"b\": 2, \"c\": false}}' -t $'\\t'
+";
 
   let brief = format!("Usage: {} [options]\n\n{}", program_name, desc);
   print!("{}", opts.usage(&brief));
+  println!("{}", examples);
 }
 
