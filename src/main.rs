@@ -3,16 +3,16 @@
    ,
   (k) 2017-2018 pete gamache <pete@gamache.org>
 
-  Jsonxf does not hold strong opinions on JSON validity or text encoding,
-  aside from that input must be 7-8 bits wide, e.g. ASCII or UTF-8.
+  Input must be in UTF-8 encoding.
+  Jsonxf does not hold strong opinions on JSON validity.
   It is designed for speed.
 */
 
 use std::fs::File;
 
 extern crate jsonxf;
-use jsonxf::pretty_print;
-use jsonxf::minimize;
+use jsonxf::pretty_print_stream;
+use jsonxf::minimize_stream;
 
 extern crate getopts;
 use getopts::Options;
@@ -75,10 +75,10 @@ fn main() {
   };
 
   let result = if matches.opt_present("m") {
-    minimize(&mut input, &mut output)
+    minimize_stream(&mut input, &mut output)
   }
   else {
-    pretty_print(&mut input, &mut output, &indent)
+    pretty_print_stream(&mut input, &mut output, &indent)
   };
 
   match result {

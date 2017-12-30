@@ -1,29 +1,29 @@
+//! Jsonxf is a JSON transformer, providing fast pretty-printing and
+//! minimizing of JSON-encoded data.
+//!
+//! It's designed for speed, and does *not* perform JSON validation.
+//! Jsonxf is not guaranteed to either accept or reject invalid input.
+//!
+
+
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Error;
 
-/// Pretty-prints JSON-formatted input.
+/// Pretty-prints a stream of JSON-formatted data.
 ///
-/// This function does *not* perform JSON validation.  It works on
-/// valid JSON, and performs best-effort formatting of invalid JSON,
-/// but it is not guaranteed to flag or tolerate bad input.
+/// This function does *not* perform JSON validation, and is not guaranteed
+/// to either reject or accept invalid input.
 ///
 /// The `indent` parameter sets the string used to indent pretty-printed
 /// output; e.g., `"  "` or `"\t"`.
 ///
-/// `pretty_print` uses `std::io::BufReader` and `std::io:BufWriter` to
-/// provide IO buffering; no external buffering should be necessary.
+/// `pretty_print_stream` uses `std::io::BufReader` and `std::io:BufWriter`
+/// to provide IO buffering; no external buffering should be necessary.
 ///
-/// # Example:
-///
-/// ```rust,no_run
-/// let result = {
-///   let mut output = File::create("output-pretty.json")?;
-///   jsonpp::pretty_print(&mut std::io::stdin(), &mut output, "  ");
-/// };
 /// ```
-pub fn pretty_print(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Error> {
+pub fn pretty_print_stream(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Error> {
   /*
     Strategy: pass bytes from `input` to `output`, taking notice of when the
     current byte is:
@@ -125,10 +125,28 @@ pub fn pretty_print(input: &mut Read, output: &mut Write, indent: &str) -> Resul
   return Ok(());
 }
 
-/// `pp` is an alias to `pretty_print`.
-pub fn pp(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Error> {
-  return pretty_print(input, output, indent);
+/// Returns a pretty-printed representation of the given string containing
+/// JSON-encoded data.
+///
+/// This function does *not* perform JSON validation, and is not guaranteed
+/// to either reject or accept invalid input.
+///
+/// The `indent` parameter sets the string used to indent pretty-printed
+/// output; e.g., `"  "` or `"\t"`.
+pub fn pretty_print(json_string: &str, indent: &str) -> Result<String, String> {
+  let mut input = json_string.as_bytes();
+  let mut output: Vec<u8> = vec![];
+  match pretty_print_stream(&mut input, &mut output, indent) {
+    Ok(_) => {},
+    Err(f) => { return Err(f.to_string()); },
+  };
+  let output_string = match String::from_utf8(output) {
+    Ok(s) => { s },
+    Err(f) => { return Err(f.to_string()); },
+  };
+  return Ok(output_string);
 }
+
 
 
 /// Minimizes JSON-formatted input.
@@ -140,16 +158,9 @@ pub fn pp(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Erro
 /// `minimize` uses `std::io::BufReader` and `std::io:BufWriter` to
 /// provide IO buffering; no external buffering should be necessary.
 ///
-/// # Example:
-///
-/// ```rust,no_run
-/// let result = {
-///   let mut output = File::create("output-min.json")?;
-///   jsonpp::minimize(&mut std::io::stdin(), &mut output);
-/// };
-/// ```
-pub fn minimize(input: &mut Read, output: &mut Write) -> Result<(), Error> {
-  // Strategy is similar to `pretty_print`, with much less whitespace mgmt
+pub fn minimize_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
+  // Strategy is similar to `pretty_print`, with much less whitespace mgmt.
+  // Care is taken not to emit a newline at the end of the stream.
 
   let reader = BufReader::new(input);
   let mut writer = BufWriter::new(output);
@@ -157,6 +168,7 @@ pub fn minimize(input: &mut Read, output: &mut Write) -> Result<(), Error> {
   let mut in_string = false;
   let mut in_backslash = false;
   let mut depth = 0;
+  let mut print_newline = false;
 
   for byte in reader.bytes() {
     let b = byte?;
@@ -175,6 +187,12 @@ pub fn minimize(input: &mut Read, output: &mut Write) -> Result<(), Error> {
          },
 
         '{' | '[' => {
+          if depth == 0 {
+            if print_newline {
+              writer.write(&['\n' as u8])?;
+            }
+            print_newline = true;
+          }
           writer.write(&[b])?;
           depth += 1;
         },
@@ -182,9 +200,9 @@ pub fn minimize(input: &mut Read, output: &mut Write) -> Result<(), Error> {
         '}' | ']' => {
           writer.write(&[b])?;
           depth -= 1;
-          if depth == 0 {
-            writer.write(&['\n' as u8])?;
-          }
+          //if depth == 0 {
+            //writer.write(&['\n' as u8])?;
+          //}
         },
 
         c => {
@@ -197,5 +215,32 @@ pub fn minimize(input: &mut Read, output: &mut Write) -> Result<(), Error> {
     }
   }
   return Ok(());
+}
+
+/// Returns a minimized version of the given string containing JSON-
+/// encoded data.
+///
+/// This function does *not* perform JSON validation.  It works on
+/// valid JSON, and performs best-effort formatting of invalid JSON,
+/// but it is not guaranteed to flag or tolerate bad input.
+///
+/// # Examples:
+///
+/// ```
+/// assert_eq!(r#"{"a":"b","c":0}"#, jsonxf::minimize(r#"{ "a": "b", "c": 0 } "#).unwrap());
+/// assert_eq!("null", jsonxf::minimize("\r\n\tnull\r\n").unwrap());
+/// ```
+pub fn minimize(json_string: &str) -> Result<String, String> {
+  let mut input = json_string.as_bytes();
+  let mut output: Vec<u8> = vec![];
+  match minimize_stream(&mut input, &mut output) {
+    Ok(_) => {},
+    Err(f) => { return Err(f.to_string()); },
+  };
+  let output_string = match String::from_utf8(output) {
+    Ok(s) => { s },
+    Err(f) => { return Err(f.to_string()); },
+  };
+  return Ok(output_string);
 }
 
