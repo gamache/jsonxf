@@ -1,6 +1,14 @@
 //! Jsonxf is a JSON transformer, providing fast pretty-printing and
 //! minimizing of JSON-encoded data.
 //!
+//! Jsonxf is built for speed, and does not attempt to perform any
+//! input validation whatsoever.  Invalid input may produce strange
+//! output.
+//!
+//! Installing this project via `cargo install` will also install the
+//! `jsonxf` command-line tool.  Run `jsonxf -h` to see configuration
+//! options.
+//!
 
 use std::io::prelude::*;
 use std::io::BufReader;
