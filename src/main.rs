@@ -6,6 +6,8 @@
   Input must be in UTF-8 encoding.
   Jsonxf does not hold strong opinions on JSON validity.
   It is designed for speed.
+
+  Run `jsonxf -h` for usage options.
 */
 
 use std::fs::File;
