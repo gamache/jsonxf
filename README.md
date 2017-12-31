@@ -15,13 +15,17 @@ Crate docs: https://docs.rs/jsonxf/
 
 ## Command-line Examples
 
-Pretty-print:
+Pretty-print a file, using two spaces to indent:
 
     jsonxf <foo.json >foo-pretty.json
 
-Minimize:
+Minimize a file:
 
     jsonxf -m <foo.json >foo-min.json
+
+Pretty-print a string, using a tab character to indent:
+
+    jsonxf -s '{"a": {"b": 2, "c": false}}' -t $'\t'
 
 Run `jsonxf -h` to see all configuration options.
 

@@ -34,9 +34,9 @@ fn do_main() -> Result<(), String> {
   let args: Vec<String> = std::env::args().collect();
 
   let mut opts = Options::new();
-  opts.optopt("i", "input", "read input from the given file (default: STDIN)", "file");
   opts.optopt("s", "string", "use the given string as input", "str");
-  opts.optopt("o", "output", "write output to the given file (default: STDOUT)", "file");
+  opts.optopt("i", "input", "read input from the given file (default: stdin)", "file");
+  opts.optopt("o", "output", "write output to the given file (default: stdout)", "file");
   opts.optopt("t", "tab", "use the given string to indent pretty-printed output (default: two spaces)", "tabstr");
   opts.optflag("m", "minimize", "minimize JSON instead of pretty-printing it");
   opts.optflag("h", "help", "print this message and exit");
