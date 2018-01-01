@@ -1,0 +1,9 @@
+[package]
+name = "serdexf"
+version = "0.1.0"
+authors = ["pete gamache <pete@gamache.org>"]
+
+[dependencies]
+serde_json = "1.0"
+serde-transcode = "1.0"
+

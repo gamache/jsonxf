@@ -15,17 +15,17 @@ Crate docs: https://docs.rs/jsonxf/
 
 ## Command-line Examples
 
-Pretty-print a file, using two spaces to indent:
+Pretty-print a string to the terminal, using two spaces to indent:
 
-    jsonxf <foo.json >foo-pretty.json
+    jsonxf -s '{"a": {"b": 2, "c": false}}'
 
-Minimize a file:
+Pretty-print and read a JSON file, using a tab character to indent:
 
-    jsonxf -m <foo.json >foo-min.json
+    jsonxf -t $'\t' <foo.json | less
 
-Pretty-print a string, using a tab character to indent:
+Minimize a file and gzip it:
 
-    jsonxf -s '{"a": {"b": 2, "c": false}}' -t $'\t'
+    jsonxf -m <foo.json | gzip -c >foo-min.json.gz
 
 Run `jsonxf -h` to see all configuration options.
 
@@ -52,29 +52,41 @@ assert_eq!(pretty_json, "{\n  \"hello\": \"world\"\n}\n");
 ## Performance
 
 Here are some benchmarks comparing Jsonxf's performance to
-several of its counterparts: [jsonpp](https://github.com/jmhodges/jsonpp)
-and [jq](https://stedolan.github.io/jq/).  `cat` is thrown in as well,
-for scale.
+several of its counterparts:
+  * [jq](https://stedolan.github.io/jq/), the extremely flexible JSON
+    processor.
+  * [jsonpp](https://github.com/jmhodges/jsonpp), a JSON pretty-printer
+    written in Go.
+  * [serdexf](benchmark/serdexf), a trivial example using the
+    [serde_json](https://serde.rs/json.html) and
+    [serde-transcode](https://serde.rs/transcode.html) libraries.
+    This implementation is not complete and is included for library
+    comparison only.
+  * `cat` is thrown in as well, for scale.
 
 Test platform: MBP (early 2013), macOS 10.12.6, 3GHz i7, 8GB RAM.
+
+See [benchmark.rb](benchmark/benchmark.rb) for testing methodology.
 
 Pretty-print test, 600MB minimized input (1M objects):
 
 | command   | time (s) | relative time | notes |
 |-----------|---------:|--------------:|-------|
-| `cat`     |     2.21 |         0.14x | `cat` is a bad pretty-printer |
-| `jsonxf`  |    15.58 |            1x | |
-| `jsonpp`  |    17.69 |         1.14x | |
-| `jq -M .` |    65.86 |         4.22x | |
+| `cat`     |     1.49 |          0.2x | `cat` is a bad pretty-printer |
+| `jsonxf`  |     7.16 |            1x | |
+| `serdexf` |     7.77 |          1.1x | no newlines between objects |
+| `jsonpp`  |    18.16 |          2.4x | |
+| `jq -M .` |    64.45 |          9.1x | |
 
 Minimize test, 850MB pretty-printed input (1M objects):
 
-| command     | time (s) | relative time | notes |
-|-------------|---------:|--------------:|-------|
-| `cat`       |     3.49 |         0.13x | `cat` is a bad minimizer |
-| `jsonxf -m` |    26.98 |            1x | |
-| `jsonpp`    |        - |             - | minimizing is not supported |
-| `jq -cM .`  |   105.53 |         3.91x | |
+| command      | time (s) | relative time | notes |
+|--------------|---------:|--------------:|-------|
+| `cat`        |     1.46 |          0.3x | `cat` is a bad minimizer |
+| `jsonxf -m`  |     4.85 |            1x | |
+| `serdexf -m` |     6.33 |          1.3x | |
+| `jsonpp`     |        - |             - | minimizing is not supported |
+| `jq -cM .`   |   105.53 |           22x | |
 
 
 ## Authorship and License

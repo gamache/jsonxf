@@ -135,17 +135,17 @@ fn print_help(program_name: &str, opts: &Options) -> () {
 minimizing of JSON-encoded UTF-8 data.";
 
   let examples = "
-Minimize a file:
+Pretty-print a string to the terminal, using two spaces to indent:
 
-    jsonxf -m <foo.json >foo-min.json
+    jsonxf -s '{\"a\": {\"b\": 2, \"c\": false}}'
 
-Pretty-print a file, using two spaces to indent:
+Pretty-print and read a JSON file, using a tab character to indent:
 
-    jsonxf <foo.json >foo-pretty.json
+    jsonxf -t $'\\t' <foo.json | less
 
-Pretty-print a string, using a tab character to indent:
+Minimize a file and gzip it:
 
-    jsonxf -s '{\"a\": {\"b\": 2, \"c\": false}}' -t $'\\t'
+    jsonxf -m <foo.json | gzip -c >foo-min.json.gz
 ";
 
   let brief = format!("Usage: {} [options]\n\n{}", program_name, desc);
