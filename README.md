@@ -66,7 +66,7 @@ several of its counterparts:
 
 Test platform: MBP (early 2013), macOS 10.12.6, 3GHz i7, 8GB RAM.
 
-See [benchmark.rb](benchmark/benchmark.rb) for testing methodology.
+See [benchmark.rb](benchmark/benchmark.rb) for testing procedure.
 
 Pretty-print test, 600MB minimized input (1M objects):
 
@@ -74,7 +74,7 @@ Pretty-print test, 600MB minimized input (1M objects):
 |-----------|---------:|--------------:|-------|
 | `cat`     |     1.49 |          0.2x | `cat` is a bad pretty-printer |
 | `jsonxf`  |     7.16 |            1x | |
-| `serdexf` |     7.77 |          1.1x | no newlines between objects |
+| `serdexf` |     7.77 |          1.1x | no newlines between objects 🙁 |
 | `jsonpp`  |    18.16 |          2.4x | |
 | `jq -M .` |    64.45 |          9.1x | |
 
@@ -85,7 +85,7 @@ Minimize test, 850MB pretty-printed input (1M objects):
 | `cat`        |     1.46 |          0.3x | `cat` is a bad minimizer |
 | `jsonxf -m`  |     4.85 |            1x | |
 | `serdexf -m` |     6.33 |          1.3x | |
-| `jsonpp`     |        - |             - | minimizing is not supported |
+| `jsonpp`     |        - |             - | minimizing is not supported 😭 |
 | `jq -cM .`   |   105.53 |           22x | |
 
 
