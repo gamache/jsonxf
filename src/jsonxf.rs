@@ -45,7 +45,6 @@ struct PpState<'a> {
 
   // required to support the case of empty {} and []
   empty: bool,  // true if !in_string and last non-whitespace was { or [
-  wbuf: String, // whitespace buffer
 }
 
 struct MinState {
@@ -125,7 +124,6 @@ pub fn pretty_print_stream(input: &mut Read, output: &mut Write, indent: &str) -
     in_string: false,
     in_backslash: false,
     empty: false,
-    wbuf: String::from(""),
   };
   loop {
     match reader.read(&mut buf) {
@@ -235,10 +233,6 @@ fn pp_buf(buf: &[u8], writer: &mut Write, state: &mut PpState) -> Result<(),Erro
           // don't write trailing whitespace immediately, in case this
           // is an empty structure
           state.empty = true;
-          state.wbuf = String::from("\n");
-          for _ in 0..state.depth {
-            state.wbuf.push_str(state.indent);
-          }
         },
 
         C_RIGHT_BRACKET | C_RIGHT_BRACE => {
@@ -272,7 +266,10 @@ fn pp_buf(buf: &[u8], writer: &mut Write, state: &mut PpState) -> Result<(),Erro
 
         _ => {
           if state.empty {
-            writer.write(state.wbuf.as_bytes())?;
+            writer.write(&[C_LF])?;
+            for _ in 0..state.depth {
+              writer.write(state.indent.as_bytes())?;
+            }
             state.empty = false;
           }
           if b == C_QUOTE {
