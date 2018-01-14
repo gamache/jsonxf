@@ -35,7 +35,7 @@ const C_LEFT_BRACKET:   u8 = '[' as u8;
 const C_RIGHT_BRACE:    u8 = '}' as u8;
 const C_RIGHT_BRACKET:  u8 = ']' as u8;
 
-struct PpState {
+struct Formatter {
   // constants
   indent: String,
   line_separator: String,
@@ -50,9 +50,9 @@ struct PpState {
   first: bool,         // is this the first byte of input?
 }
 
-impl PpState {
-  fn default() -> PpState {
-    PpState {
+impl Formatter {
+  fn default() -> Formatter {
+    Formatter {
       indent: String::from("  "),
       line_separator: String::from("\n"),
       record_separator: String::from("\n"),
@@ -65,12 +65,12 @@ impl PpState {
     }
   }
 
-  pub fn pretty_printer() -> PpState {
-    return PpState::default();
+  pub fn pretty_printer() -> Formatter {
+    return Formatter::default();
   }
 
-  pub fn minimizer() -> PpState {
-    let mut xf = PpState::default();
+  pub fn minimizer() -> Formatter {
+    let mut xf = Formatter::default();
     xf.indent = String::from("");
     xf.line_separator = String::from("");
     xf.record_separator = String::from("\n");
@@ -78,10 +78,10 @@ impl PpState {
     return xf;
   }
 
-  pub fn pretty_print(&mut self, json_string: &str) -> Result<String, String> {
+  pub fn format(&mut self, json_string: &str) -> Result<String, String> {
     let mut input = json_string.as_bytes();
     let mut output: Vec<u8> = vec![];
-    match self.pretty_print_stream(&mut input, &mut output) {
+    match self.format_stream(&mut input, &mut output) {
       Ok(_) => {},
       Err(f) => { return Err(f.to_string()); },
     };
@@ -92,14 +92,14 @@ impl PpState {
     return Ok(output_string);
   }
 
-  pub fn pretty_print_stream(&mut self, input: &mut Read, output: &mut Write) -> Result<(), Error> {
+  pub fn format_stream(&mut self, input: &mut Read, output: &mut Write) -> Result<(), Error> {
     let mut reader = BufReader::new(input);
     let mut writer = BufWriter::new(output);
     let mut buf = [0 as u8; BUF_SIZE];
     loop {
       match reader.read(&mut buf) {
         Ok(0) => { break; },
-        Ok(n) => { self.pp_buf(&buf[0..n], &mut writer)?; },
+        Ok(n) => { self.format_buf(&buf[0..n], &mut writer)?; },
         Err(e) => { return Err(e); },
       }
     }
@@ -107,9 +107,8 @@ impl PpState {
   }
 
 
-
-  /* Pretty-prints the contents of `buf` into `writer`. */
-  fn pp_buf(&mut self, buf: &[u8], writer: &mut Write) -> Result<(),Error> {
+  /* Formats the contents of `buf` into `writer`. */
+  fn format_buf(&mut self, buf: &[u8], writer: &mut Write) -> Result<(),Error> {
     for n in 0..buf.len() {
       let b = buf[n];
 
@@ -206,9 +205,9 @@ impl PpState {
 /// ```
 ///
 pub fn pretty_print(json_string: &str, indent: &str) -> Result<String, String> {
-  let mut xf = PpState::pretty_printer();
+  let mut xf = Formatter::pretty_printer();
   xf.indent = indent.to_owned();
-  return xf.pretty_print(json_string);
+  return xf.format(json_string);
 }
 
 /// Pretty-prints a stream of JSON-encoded data.
@@ -233,9 +232,9 @@ pub fn pretty_print(json_string: &str, indent: &str) -> Result<String, String> {
 /// ```
 ///
 pub fn pretty_print_stream(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Error> {
-  let mut xf = PpState::pretty_printer();
+  let mut xf = Formatter::pretty_printer();
   xf.indent = indent.to_owned();
-  return xf.pretty_print_stream(input, output);
+  return xf.format_stream(input, output);
 }
 
 /// Minimizes a string of JSON-encoded data.
@@ -258,8 +257,8 @@ pub fn pretty_print_stream(input: &mut Read, output: &mut Write, indent: &str) -
 /// ```
 ///
 pub fn minimize(json_string: &str) -> Result<String, String> {
-  let mut xf = PpState::minimizer();
-  return xf.pretty_print(json_string);
+  let mut xf = Formatter::minimizer();
+  return xf.format(json_string);
 }
 
 /// Minimizes a string of JSON-encoded data.
@@ -282,62 +281,7 @@ pub fn minimize(json_string: &str) -> Result<String, String> {
 /// ```
 ///
 pub fn minimize_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
-  let mut xf = PpState::minimizer();
-  return xf.pretty_print_stream(input, output);
+  let mut xf = Formatter::minimizer();
+  return xf.format_stream(input, output);
 }
-
-
-
-
-/* Minimizes the contents of `buf` into `writer`. * /
-fn min_buf(buf: &[u8], writer: &mut Write, state: &mut MinState) -> Result<(), Error> {
-  for n in 0..buf.len() {
-    let b = buf[n];
-
-    if state.in_string {
-      writer.write(&buf[n..n+1])?;
-      if state.in_backslash { state.in_backslash = false; }
-      else if b == C_QUOTE { state.in_string = false; }
-      else if b == C_BACKSLASH { state.in_backslash = true; }
-    }
-    else {
-      match b {
-        C_SPACE | C_LF | C_CR | C_TAB => {
-          // skip whitespace
-        },
-
-        C_LEFT_BRACKET | C_LEFT_BRACE => {
-          if state.depth == 0 {
-            if state.print_newline {
-              writer.write(&[C_LF])?;
-            }
-            else {
-              state.print_newline = true;
-            }
-          }
-          state.depth += 1;
-          writer.write(&buf[n..n+1])?;
-        },
-
-        C_RIGHT_BRACKET | C_RIGHT_BRACE => {
-          state.depth -= 1;
-          writer.write(&buf[n..n+1])?;
-        },
-
-        _ => {
-          if b == C_QUOTE {
-            state.in_string = true;
-          }
-          writer.write(&buf[n..n+1])?;
-        },
-      };
-    };
-  };
-
-  return Ok(());
-}
-
-*/
-
-
 
