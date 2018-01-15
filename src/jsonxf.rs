@@ -3,12 +3,11 @@
 //! in string or stream format.  Use it to customize the
 //! presentation of valid JSON data.
 //!
-//! It provides default pretty-printers (`jsonxf::pretty_print()`,
-//! `jsonxf::pretty_print_stream()`) and minimizers
-//! (`jsonxf::minimize()`, `jsonxf::minimize_stream()`),
-//! `jsonxf::Formatter` for customizable JSON formatting,
-//! and the `jsonxf` command-line tool (see `jsonxf -h` for
-//! options).
+//! It provides default pretty-printers (`pretty_print()`,
+//! `pretty_print_stream()`) and minimizers (`minimize()`,
+//! `minimize_stream()`), `Formatter` for customizable JSON
+//! formatting, and the `jsonxf` command-line tool (see
+//! `jsonxf -h` for options).
 //!
 //! Jsonxf is built for speed, and does not attempt to perform any
 //! input validation whatsoever.  Valid input produces valid output,
@@ -99,12 +98,11 @@ impl Formatter {
     /// Defaults to using two spaces of indentation,
     /// Unix newlines, and no whitespace at EOF.
     ///
-    /// Example:
+    /// # Example:
     ///
     /// ```
-    /// let mut pp = jsonxf::Formatter::pretty_printer();
     /// assert_eq!(
-    ///     pp.format("{\"a\":1}").unwrap(),
+    ///     jsonxf::Formatter::pretty_printer().format("{\"a\":1}").unwrap(),
     ///     "{\n  \"a\": 1\n}"
     /// );
     /// ```
@@ -116,12 +114,11 @@ impl Formatter {
     /// Defaults to using Unix newlines between records,
     /// and no whitespace at EOF.
     ///
-    /// Example:
+    /// # Example:
     ///
     /// ```
-    /// let mut min = jsonxf::Formatter::minimizer();
     /// assert_eq!(
-    ///     min.format("{  \"a\" : 1  }\n").unwrap(),
+    ///     jsonxf::Formatter::minimizer().format("{  \"a\" : 1  }\n").unwrap(),
     ///     "{\"a\":1}"
     /// );
     /// ```
@@ -134,10 +131,11 @@ impl Formatter {
         return xf;
     }
 
-    /// Returns a `Result` containing either a `String` containing
-    /// a formatted `json_string`, or a `String` describing the error.
+    /// Formats a string of JSON-encoded data.
     ///
-    /// Example:
+    /// Input must be valid JSON data in UTF-8 encoding.
+    ///
+    /// # Example:
     ///
     /// ```
     /// let mut fmt = jsonxf::Formatter::pretty_printer();
@@ -166,7 +164,11 @@ impl Formatter {
         return Ok(output_string);
     }
 
-    /// Formats the data in `input` and writes it to `output`.
+    /// Formats a stream of JSON-encoded data.
+    ///
+    /// Input must be valid JSON data in UTF-8 encoding.
+    ///
+    /// # Example:
     ///
     /// ```no_run
     /// let mut fmt = jsonxf::Formatter::pretty_printer();
@@ -290,7 +292,7 @@ impl Formatter {
 
 /// Pretty-prints a string of JSON-encoded data.
 ///
-/// Input must be valid JSON-encoded data in UTF-8 encoding.
+/// Input must be valid JSON data in UTF-8 encoding.
 ///
 /// The output will use two spaces as an indent, a line feed
 /// as newline character, and no trailing whitespace.
@@ -316,7 +318,7 @@ pub fn pretty_print(json_string: &str) -> Result<String, String> {
 
 /// Pretty-prints a stream of JSON-encoded data.
 ///
-/// Input must be valid JSON-encoded data in UTF-8 encoding.
+/// Input must be valid JSON data in UTF-8 encoding.
 ///
 /// The output will use two spaces as an indent, a line feed
 /// as newline character, and no trailing whitespace.
@@ -341,7 +343,7 @@ pub fn pretty_print_stream(input: &mut Read, output: &mut Write) -> Result<(), E
 
 /// Minimizes a string of JSON-encoded data.
 ///
-/// Input must be valid JSON-encoded data in UTF-8 encoding.
+/// Input must be valid JSON data in UTF-8 encoding.
 ///
 /// The output will use a line feed as newline character between
 /// records, and no trailing whitespace.  To customize this behavior,
@@ -366,7 +368,7 @@ pub fn minimize(json_string: &str) -> Result<String, String> {
 
 /// Minimizes a stream of JSON-encoded data.
 ///
-/// Input must be valid JSON-encoded data in UTF-8 encoding.
+/// Input must be valid JSON data in UTF-8 encoding.
 ///
 /// The output will use a line feed as newline character between
 /// records, and no trailing whitespace.  To customize this behavior,
