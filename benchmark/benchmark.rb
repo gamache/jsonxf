@@ -11,6 +11,8 @@ raise "MIN_INPUT must be provided" unless MIN_INPUT
 
 OUTPUT = ENV["OUTPUT"] || "/tmp/out.json"
 
+SKIP_JQ = !!ENV["SKIP_JQ"]
+
 TIME_REGEX = %r/
   real \s+ (?<min>\d+) m (?<sec>\d+) \. (?<msec>\d+) s
 /x;
@@ -47,7 +49,7 @@ puts time_str("cat")
 puts time_str("../target/release/jsonxf")
 puts time_str("./serdexf/target/release/serdexf")
 puts time_str("jsonpp")
-puts time_str("jq -M .")
+puts time_str("jq -M .") unless SKIP_JQ
 
 puts ""
 
@@ -55,5 +57,5 @@ puts "Minimize test:"
 puts time_str("cat")
 puts time_str("../target/release/jsonxf -m")
 puts time_str("./serdexf/target/release/serdexf -m")
-puts time_str("jq -cM .")
+puts time_str("jq -cM .") unless SKIP_JQ
 

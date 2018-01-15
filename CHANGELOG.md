@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0 (2018-01-15)
+
+Breaking change: removed `indent` parameter from `pretty_print()` and
+`pretty_print_stream()`.
+
+Added `Formatter` to support customized formatting.
+
+Major refactor.
+
 ## 0.7.0 (2018-01-01)
 
 Performance improvements and an improved benchmark harness.

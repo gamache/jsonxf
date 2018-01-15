@@ -36,7 +36,7 @@ In your `Cargo.toml`:
 
 ```
 [dependencies]
-jsonxf = "0.5"
+jsonxf = "0.9"
 ```
 
 In your code:
@@ -44,7 +44,7 @@ In your code:
 ```rust
 extern crate jsonxf;
 let ugly_json = "{\"hello\":\"world\"}";
-let pretty_json = jsonxf::pretty_print(ugly_json, "  ").unwrap();
+let pretty_json = jsonxf::pretty_print(ugly_json).unwrap();
 assert_eq!(pretty_json, "{\n  \"hello\": \"world\"\n}\n");
 ```
 
