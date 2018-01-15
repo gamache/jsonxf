@@ -13,8 +13,6 @@
 use std::fs::File;
 
 extern crate jsonxf;
-use jsonxf::pretty_print_stream;
-use jsonxf::minimize_stream;
 
 extern crate getopts;
 use getopts::Options;
@@ -117,10 +115,13 @@ fn do_main() -> Result<(), String> {
   };
 
   let result = if matches.opt_present("m") {
-    minimize_stream(&mut input, &mut output)
+      let mut xf =jsonxf::Formatter::minimizer();
+      xf.format_stream(&mut input, &mut output)
   }
   else {
-    pretty_print_stream(&mut input, &mut output, &indent)
+      let mut xf = jsonxf::Formatter::pretty_printer();
+      xf.indent = indent;
+      xf.format_stream(&mut input, &mut output)
   };
 
   match result {

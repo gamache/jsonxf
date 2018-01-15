@@ -1,13 +1,19 @@
-//! Jsonxf is a JSON transformer, providing fast pretty-printing and
-//! minimizing of JSON-encoded data.
+//! Jsonxf is a JSON transformer, supporting fast pretty-printing,
+//! minimizing, and similar formatting of JSON-encoded UTF-8 data
+//! in string or stream format.  Use it to customize the
+//! presentation of valid JSON data.
+//!
+//! It provides default pretty-printers (`jsonxf::pretty_print()`,
+//! `jsonxf::pretty_print_stream()`) and minimizers
+//! (`jsonxf::minimize()`, `jsonxf::minimize_stream()`),
+//! `jsonxf::Formatter` for customizable JSON formatting,
+//! and the `jsonxf` command-line tool (see `jsonxf -h` for
+//! options).
 //!
 //! Jsonxf is built for speed, and does not attempt to perform any
-//! input validation whatsoever.  Invalid input may produce strange
-//! output.
-//!
-//! Installing this project via `cargo install` will also install the
-//! `jsonxf` command-line tool.  Run `jsonxf -h` to see configuration
-//! options.
+//! input validation whatsoever.  Valid input produces valid output,
+//! but no guarantees are offered around the detection and rejection
+//! of invalid input.
 //!
 //! GitHub:
 //! <a href="https://github.com/gamache/jsonxf" target="_blank">gamache/jsonxf</a>
@@ -35,8 +41,9 @@ const C_LEFT_BRACKET: u8 = '[' as u8;
 const C_RIGHT_BRACE: u8 = '}' as u8;
 const C_RIGHT_BRACKET: u8 = ']' as u8;
 
-/// `Formatter` allows pretty-printing, minimizing, and other
-/// formatting tasks on JSON-encoded data in UTF-8 format.
+/// `Formatter` allows customizable pretty-printing, minimizing,
+/// and other formatting tasks on JSON-encoded UTF-8 data in
+/// string or stream format.
 ///
 /// Example:
 ///
@@ -283,64 +290,62 @@ impl Formatter {
 
 /// Pretty-prints a string of JSON-encoded data.
 ///
-/// Valid inputs produce valid outputs.  However, this function does
-/// *not* perform JSON validation, and is not guaranteed to either
-/// reject or accept invalid input.
+/// Input must be valid JSON-encoded data in UTF-8 encoding.
 ///
-/// The `indent` parameter sets the string used to indent pretty-printed
-/// output; e.g., `"  "` or `"\t"`.
+/// The output will use two spaces as an indent, a line feed
+/// as newline character, and no trailing whitespace.
+/// To customize this behavior, use a
+/// `jsonxf::Formatter::pretty_printer()` directly.
 ///
 /// # Examples:
 ///
 /// ```
 /// assert_eq!(
-///     jsonxf::pretty_print("{\"a\":1,\"b\":2}", "  ").unwrap(),
+///     jsonxf::pretty_print("{\"a\":1,\"b\":2}").unwrap(),
 ///     "{\n  \"a\": 1,\n  \"b\": 2\n}"
 /// );
 /// assert_eq!(
-///     jsonxf::pretty_print("{\"empty\":{},\n\n\n\n\n\"one\":[1]}", "\t").unwrap(),
-///     "{\n\t\"empty\": {},\n\t\"one\": [\n\t\t1\n\t]\n}"
+///     jsonxf::pretty_print("{\"empty\":{},\n\n\n\n\n\"one\":[1]}").unwrap(),
+///     "{\n  \"empty\": {},\n  \"one\": [\n    1\n  ]\n}"
 /// );
 /// ```
 ///
-pub fn pretty_print(json_string: &str, indent: &str) -> Result<String, String> {
-    let mut xf = Formatter::pretty_printer();
-    xf.indent = indent.to_owned();
-    return xf.format(json_string);
+pub fn pretty_print(json_string: &str) -> Result<String, String> {
+    Formatter::pretty_printer().format(json_string)
 }
 
 /// Pretty-prints a stream of JSON-encoded data.
 ///
-/// Valid inputs produce valid outputs.  However, this function does
-/// *not* perform JSON validation, and is not guaranteed to either
-/// reject or accept invalid input.
+/// Input must be valid JSON-encoded data in UTF-8 encoding.
 ///
-/// The `indent` parameter sets the string used to indent pretty-printed
-/// output; e.g., `"  "` or `"\t"`.
+/// The output will use two spaces as an indent, a line feed
+/// as newline character, and no trailing whitespace.
+/// To customize this behavior, use a
+/// `jsonxf::Formatter::pretty_printer()` directly.
 ///
 /// `pretty_print_stream` uses `std::io::BufReader` and `std::io:BufWriter`
 /// to provide IO buffering; no external buffering should be necessary.
 ///
-/// # Example
+/// # Example:
 ///
 /// ```no_run
-/// match jsonxf::pretty_print_stream(&mut std::io::stdin(), &mut std::io::stdout(), "\t") {
-///     Ok(_) => { },
+/// match jsonxf::pretty_print_stream(&mut std::io::stdin(), &mut std::io::stdout()) {
+///     Ok(_) => { /* YAY */ },
 ///     Err(e) => { panic!(e.to_string()) }
 /// };
 /// ```
 ///
-pub fn pretty_print_stream(input: &mut Read, output: &mut Write, indent: &str) -> Result<(), Error> {
-    let mut xf = Formatter::pretty_printer();
-    xf.indent = indent.to_owned();
-    return xf.format_stream(input, output);
+pub fn pretty_print_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
+    Formatter::pretty_printer().format_stream(input, output)
 }
 
 /// Minimizes a string of JSON-encoded data.
 ///
-/// Valid inputs produce valid outputs.  However, this function does
-/// *not* perform JSON validation, and is not guaranteed to either
-/// reject or accept invalid input.
+/// Input must be valid JSON-encoded data in UTF-8 encoding.
+///
+/// The output will use a line feed as newline character between
+/// records, and no trailing whitespace.  To customize this behavior,
+/// use a `jsonxf::Formatter::minimizer()` directly.
 ///
 /// # Examples:
 ///
@@ -359,23 +364,24 @@ pub fn minimize(json_string: &str) -> Result<String, String> {
     Formatter::minimizer().format(json_string)
 }
 
-/// Minimizes a string of JSON-encoded data.
+/// Minimizes a stream of JSON-encoded data.
 ///
-/// Valid inputs produce valid outputs.  However, this function does
-/// *not* perform JSON validation, and is not guaranteed to either
-/// reject or accept invalid input.
+/// Input must be valid JSON-encoded data in UTF-8 encoding.
 ///
-/// # Examples:
+/// The output will use a line feed as newline character between
+/// records, and no trailing whitespace.  To customize this behavior,
+/// use a `jsonxf::Formatter::minimizer()` directly.
 ///
-/// ```
-/// assert_eq!(
-///     jsonxf::minimize("{ \"a\": \"b\", \"c\": 0 } ").unwrap(),
-///     "{\"a\":\"b\",\"c\":0}"
-/// );
-/// assert_eq!(
-///     jsonxf::minimize("\r\n\tnull\r\n").unwrap(),
-///     "null"
-/// );
+/// `minimize_stream` uses `std::io::BufReader` and `std::io:BufWriter`
+/// to provide IO buffering; no external buffering should be necessary.
+///
+/// # Example:
+///
+/// ```no_run
+/// match jsonxf::minimize_stream(&mut std::io::stdin(), &mut std::io::stdout()) {
+///     Ok(_) => { /* YAY */ },
+///     Err(e) => { panic!(e.to_string()) }
+/// };
 /// ```
 ///
 pub fn minimize_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
