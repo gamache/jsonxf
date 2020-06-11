@@ -75,7 +75,7 @@ fn do_main() -> Result<(), String> {
     }
 
     let mut input_str = String::from("");
-    let mut input: Box<std::io::Read> = match matches.opt_str("i") {
+    let mut input: Box<dyn std::io::Read> = match matches.opt_str("i") {
         None => {
             match matches.opt_str("s") {
                 None => Box::new(std::io::stdin()),
@@ -102,7 +102,7 @@ fn do_main() -> Result<(), String> {
         }
     };
 
-    let mut output: Box<std::io::Write> = match matches.opt_str("o") {
+    let mut output: Box<dyn std::io::Write> = match matches.opt_str("o") {
         None => Box::new(std::io::stdout()),
         Some(filename) => {
             if filename == "-".to_owned() {
