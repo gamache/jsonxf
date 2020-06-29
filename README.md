@@ -91,7 +91,7 @@ Minimize test, 850MB pretty-printed input (1M objects):
 
 ## Authorship and License
 
-Copyright 2017-2018, Pete Gamache.
+Copyright 2017-2020, Pete Gamache.
 
 Jsonxf is released under the MIT License.
 
