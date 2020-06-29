@@ -179,7 +179,7 @@ impl Formatter {
     ///     Err(e) => { panic!(e.to_string()); }
     /// }
     /// ```
-    pub fn format_stream(&mut self, input: &mut Read, output: &mut Write) -> Result<(), Error> {
+    pub fn format_stream(&mut self, input: &mut dyn Read, output: &mut dyn Write) -> Result<(), Error> {
         let mut reader = BufReader::new(input);
         let mut writer = BufWriter::new(output);
         let mut buf = [0 as u8; BUF_SIZE];
@@ -202,7 +202,7 @@ impl Formatter {
 
 
     /* Formats the contents of `buf` into `writer`. */
-    fn format_buf(&mut self, buf: &[u8], writer: &mut Write) -> Result<(), Error> {
+    fn format_buf(&mut self, buf: &[u8], writer: &mut dyn Write) -> Result<(), Error> {
         for n in 0..buf.len() {
             let b = buf[n];
 
@@ -337,7 +337,7 @@ pub fn pretty_print(json_string: &str) -> Result<String, String> {
 /// };
 /// ```
 ///
-pub fn pretty_print_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
+pub fn pretty_print_stream(input: &mut dyn Read, output: &mut dyn Write) -> Result<(), Error> {
     Formatter::pretty_printer().format_stream(input, output)
 }
 
@@ -386,6 +386,6 @@ pub fn minimize(json_string: &str) -> Result<String, String> {
 /// };
 /// ```
 ///
-pub fn minimize_stream(input: &mut Read, output: &mut Write) -> Result<(), Error> {
+pub fn minimize_stream(input: &mut dyn Read, output: &mut dyn Write) -> Result<(), Error> {
     Formatter::minimizer().format_stream(input, output)
 }
