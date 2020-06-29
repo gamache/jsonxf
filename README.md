@@ -36,7 +36,7 @@ In your `Cargo.toml`:
 
 ```
 [dependencies]
-jsonxf = "0.9"
+jsonxf = "1.0"
 ```
 
 In your code:
