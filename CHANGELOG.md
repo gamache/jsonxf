@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0 (2020-06-29)
+
+Updated to latest `getopts` and fixed some deprecated style.
+Thanks, [@veer66](https://github.com/veer66)!
+
 ## 0.9.0 (2018-01-15)
 
 Breaking change: removed `indent` parameter from `pretty_print()` and
