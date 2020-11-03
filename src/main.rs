@@ -15,7 +15,6 @@ extern crate jsonxf;
 extern crate getopts;
 use getopts::Options;
 
-
 fn main() {
     match do_main() {
         Ok(_) => { /* YAY */ }
@@ -74,21 +73,26 @@ fn do_main() -> Result<(), String> {
         return Ok(());
     }
 
+    // If these are set and match later, we need to take care not to
+    // truncate the input file.
+    let mut input_filename: Option<String> = None;
+    let mut output_filename: Option<String> = None;
+    let mut output_temp_filename: Option<String> = None;
+
     let mut input_str = String::from("");
     let mut input: Box<dyn std::io::Read> = match matches.opt_str("i") {
-        None => {
-            match matches.opt_str("s") {
-                None => Box::new(std::io::stdin()),
-                Some(json_str) => {
-                    input_str.push_str(&json_str);
-                    Box::new(input_str.as_bytes())
-                }
+        None => match matches.opt_str("s") {
+            None => Box::new(std::io::stdin()),
+            Some(json_str) => {
+                input_str.push_str(&json_str);
+                Box::new(input_str.as_bytes())
             }
-        }
+        },
         Some(filename) => {
             if filename == "-".to_owned() {
                 Box::new(std::io::stdin())
             } else {
+                input_filename = Some(String::from(&filename));
                 match File::open(&filename) {
                     Ok(f) => Box::new(f),
                     Err(e) => {
@@ -108,7 +112,21 @@ fn do_main() -> Result<(), String> {
             if filename == "-".to_owned() {
                 Box::new(std::io::stdout())
             } else {
-                match File::create(&filename) {
+                let mut temp_filename = String::from(&filename);
+
+                match input_filename {
+                    None => (),
+                    Some(f) => {
+                        if f == filename {
+                            temp_filename.push_str(".tmp");
+                        }
+                    }
+                }
+
+                output_filename = Some(String::from(&filename));
+                output_temp_filename = Some(String::from(&temp_filename));
+
+                match File::create(&temp_filename) {
                     Ok(f) => Box::new(f),
                     Err(e) => {
                         let mut estr = String::from(filename);
@@ -134,6 +152,11 @@ fn do_main() -> Result<(), String> {
         xf.indent = indent;
         xf.format_stream(&mut input, &mut output)
     };
+
+    match output_temp_filename {
+        None => (),
+        Some(temp_filename) => std::fs::rename(temp_filename, output_filename.unwrap()).unwrap(),
+    }
 
     match result {
         Err(e) => Err(e.to_string()),
