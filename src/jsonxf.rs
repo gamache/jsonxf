@@ -71,11 +71,11 @@ pub struct Formatter {
     pub trailing_output: String,
 
     // private mutable state
-    depth: usize, // current nesting depth
-    in_string: bool, // is the next byte part of a string?
+    depth: usize,       // current nesting depth
+    in_string: bool,    // is the next byte part of a string?
     in_backslash: bool, // does the next byte follow a backslash in a string?
-    empty: bool, // is the next byte in an empty object or array?
-    first: bool, // is this the first byte of input?
+    empty: bool,        // is the next byte in an empty object or array?
+    first: bool,        // is this the first byte of input?
 }
 
 impl Formatter {
@@ -179,7 +179,11 @@ impl Formatter {
     ///     Err(e) => { panic!(e.to_string()); }
     /// }
     /// ```
-    pub fn format_stream(&mut self, input: &mut dyn Read, output: &mut dyn Write) -> Result<(), Error> {
+    pub fn format_stream(
+        &mut self,
+        input: &mut dyn Read,
+        output: &mut dyn Write,
+    ) -> Result<(), Error> {
         let mut reader = BufReader::new(input);
         let mut writer = BufWriter::new(output);
         let mut buf = [0 as u8; BUF_SIZE];
@@ -199,7 +203,6 @@ impl Formatter {
         writer.write(self.trailing_output.as_bytes())?;
         return Ok(());
     }
-
 
     /* Formats the contents of `buf` into `writer`. */
     fn format_buf(&mut self, buf: &[u8], writer: &mut dyn Write) -> Result<(), Error> {
@@ -231,7 +234,6 @@ impl Formatter {
                                 writer.write(self.indent.as_bytes())?;
                             }
                             writer.write(&buf[n..n + 1])?;
-
                         } else if self.depth == 0 {
                             writer.write(self.record_separator.as_bytes())?;
                             writer.write(&buf[n..n + 1])?;
