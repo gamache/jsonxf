@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 (2020-11-03)
+
+Fixed bug where `jsonxf -i foo -o foo` would truncate `foo`.
+Thanks for the report, [@anthhub](https://github.com/anthhub)!
+
 ## 1.0.0 (2020-06-29)
 
 Updated to latest `getopts` and fixed some deprecated style.
