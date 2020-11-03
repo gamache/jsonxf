@@ -27,7 +27,8 @@ fn record_separator() {
     xf.record_separator = String::from("X");
     assert_eq!(
         "{\"a\":{\"b\":{\"c\":3}}}X{\"a\":{\"b\":{\"c\":3}}}",
-        xf.format("{\"a\":{\"b\":{\"c\":3}}}{\"a\":{\"b\":{\"c\":3}}}").unwrap()
+        xf.format("{\"a\":{\"b\":{\"c\":3}}}{\"a\":{\"b\":{\"c\":3}}}")
+            .unwrap()
     );
 }
 
@@ -50,4 +51,3 @@ fn trailing_output() {
         xf.format("{\"a\":{\"b\":{\"c\":3}}}").unwrap()
     );
 }
-
