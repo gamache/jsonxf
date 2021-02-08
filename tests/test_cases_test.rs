@@ -59,3 +59,8 @@ fn simple_list_test() {
 fn simple_object_test() {
     test("simple-object");
 }
+
+#[test]
+fn loose_bracket() {
+    test("loose-bracket");
+}
