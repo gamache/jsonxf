@@ -245,7 +245,7 @@ impl Formatter {
                     }
 
                     C_RIGHT_BRACKET | C_RIGHT_BRACE => {
-                        self.depth -= 1;
+                        self.depth = self.depth.saturating_sub(1);
                         if self.empty {
                             self.empty = false;
                             writer.write(&buf[n..n + 1])?;
