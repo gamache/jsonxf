@@ -8,7 +8,7 @@
   Run `jsonxf -h` for usage options.
 */
 
-use std::fs::File;
+use std::{fs::File, io::ErrorKind};
 
 extern crate jsonxf;
 
@@ -159,6 +159,7 @@ fn do_main() -> Result<(), String> {
     }
 
     match result {
+        Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
         Err(e) => Err(e.to_string()),
         Ok(_) => Ok(()),
     }
