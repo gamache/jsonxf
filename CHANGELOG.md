@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 (2021-02-09)
+
+Fixed bug where an input of an unmatched closing bracket would
+result in a surprisingly deep indent. Thanks,
+[@blyxxyz](https://github.com/blyxxyz)!
+
 ## 1.0.1 (2020-11-03)
 
 Fixed bug where `jsonxf -i foo -o foo` would truncate `foo`.

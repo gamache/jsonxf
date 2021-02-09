@@ -1,6 +1,6 @@
 [package]
 name = "jsonxf"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["pete gamache <pete@gamache.org>"]
 description = "A fast JSON pretty-printer and minimizer."
 homepage = "https://github.com/gamache/jsonxf"
