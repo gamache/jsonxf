@@ -229,17 +229,35 @@ impl Formatter {
 
     /* Formats the contents of `buf` into `writer`. */
     fn format_buf(&mut self, buf: &[u8], writer: &mut impl Write) -> Result<(), Error> {
-        for n in 0..buf.len() {
+        let mut n = 0;
+        while n < buf.len() {
             let b = buf[n];
 
             if self.in_string {
-                writer.write_all(&buf[n..n + 1])?;
                 if self.in_backslash {
+                    writer.write_all(&buf[n..n + 1])?;
                     self.in_backslash = false;
-                } else if b == C_QUOTE {
-                    self.in_string = false;
-                } else if b == C_BACKSLASH {
-                    self.in_backslash = true;
+                } else {
+                    match memchr::memchr2(C_QUOTE, C_BACKSLASH, &buf[n..]) {
+                        None => {
+                            // The whole rest of buf is part of the string
+                            writer.write_all(&buf[n..])?;
+                            break;
+                        }
+                        Some(index) => {
+                            let length = index + 1;
+                            writer.write_all(&buf[n..n + length])?;
+                            if buf[n + index] == C_QUOTE {
+                                // End of string
+                                self.in_string = false;
+                            } else {
+                                // Backslash
+                                self.in_backslash = true;
+                            }
+                            n += length;
+                            continue;
+                        }
+                    }
                 }
             } else {
                 match b {
@@ -309,6 +327,7 @@ impl Formatter {
                     }
                 };
             };
+            n += 1;
         }
 
         return Ok(());
