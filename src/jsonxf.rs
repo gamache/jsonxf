@@ -200,7 +200,7 @@ impl Formatter {
                 }
             }
         }
-        writer.write(self.trailing_output.as_bytes())?;
+        writer.write_all(self.trailing_output.as_bytes())?;
         return Ok(());
     }
 
@@ -210,7 +210,7 @@ impl Formatter {
             let b = buf[n];
 
             if self.in_string {
-                writer.write(&buf[n..n + 1])?;
+                writer.write_all(&buf[n..n + 1])?;
                 if self.in_backslash {
                     self.in_backslash = false;
                 } else if b == C_QUOTE {
@@ -227,18 +227,18 @@ impl Formatter {
                     C_LEFT_BRACKET | C_LEFT_BRACE => {
                         if self.first {
                             self.first = false;
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(&buf[n..n + 1])?;
                         } else if self.empty {
-                            writer.write(self.line_separator.as_bytes())?;
+                            writer.write_all(self.line_separator.as_bytes())?;
                             for _ in 0..self.depth {
-                                writer.write(self.indent.as_bytes())?;
+                                writer.write_all(self.indent.as_bytes())?;
                             }
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(&buf[n..n + 1])?;
                         } else if self.depth == 0 {
-                            writer.write(self.record_separator.as_bytes())?;
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(self.record_separator.as_bytes())?;
+                            writer.write_all(&buf[n..n + 1])?;
                         } else {
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(&buf[n..n + 1])?;
                         }
                         self.depth += 1;
                         self.empty = true;
@@ -248,41 +248,41 @@ impl Formatter {
                         self.depth = self.depth.saturating_sub(1);
                         if self.empty {
                             self.empty = false;
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(&buf[n..n + 1])?;
                         } else {
-                            writer.write(self.line_separator.as_bytes())?;
+                            writer.write_all(self.line_separator.as_bytes())?;
                             for _ in 0..self.depth {
-                                writer.write(self.indent.as_bytes())?;
+                                writer.write_all(self.indent.as_bytes())?;
                             }
-                            writer.write(&buf[n..n + 1])?;
+                            writer.write_all(&buf[n..n + 1])?;
                         }
                     }
 
                     C_COMMA => {
-                        writer.write(&buf[n..n + 1])?;
-                        writer.write(self.line_separator.as_bytes())?;
+                        writer.write_all(&buf[n..n + 1])?;
+                        writer.write_all(self.line_separator.as_bytes())?;
                         for _ in 0..self.depth {
-                            writer.write(self.indent.as_bytes())?;
+                            writer.write_all(self.indent.as_bytes())?;
                         }
                     }
 
                     C_COLON => {
-                        writer.write(&buf[n..n + 1])?;
-                        writer.write(self.after_colon.as_bytes())?;
+                        writer.write_all(&buf[n..n + 1])?;
+                        writer.write_all(self.after_colon.as_bytes())?;
                     }
 
                     _ => {
                         if self.empty {
-                            writer.write(self.line_separator.as_bytes())?;
+                            writer.write_all(self.line_separator.as_bytes())?;
                             for _ in 0..self.depth {
-                                writer.write(self.indent.as_bytes())?;
+                                writer.write_all(self.indent.as_bytes())?;
                             }
                             self.empty = false;
                         }
                         if b == C_QUOTE {
                             self.in_string = true;
                         }
-                        writer.write(&buf[n..n + 1])?;
+                        writer.write_all(&buf[n..n + 1])?;
                     }
                 };
             };
