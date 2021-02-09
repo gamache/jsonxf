@@ -150,6 +150,8 @@ fn do_main() -> Result<(), String> {
     } else {
         let mut xf = jsonxf::Formatter::pretty_printer();
         xf.indent = indent;
+        // Ensure a trailing newline, as expected on Unix
+        xf.eager_record_separators = true;
         xf.format_stream(&mut input, &mut output)
     };
 
