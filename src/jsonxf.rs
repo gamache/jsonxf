@@ -70,6 +70,10 @@ pub struct Formatter {
     /// Used at very end of output.
     pub trailing_output: String,
 
+    /// Add a record_separator as soon as a record ends, before seeing a
+    /// subsequent record. Useful when there's a long time between records.
+    pub eager_record_separators: bool,
+
     // private mutable state
     depth: usize,       // current nesting depth
     in_string: bool,    // is the next byte part of a string?
@@ -86,6 +90,7 @@ impl Formatter {
             record_separator: String::from("\n"),
             after_colon: String::from(" "),
             trailing_output: String::from(""),
+            eager_record_separators: false,
             depth: 0,
             in_string: false,
             in_backslash: false,
@@ -275,7 +280,7 @@ impl Formatter {
                                 writer.write_all(self.indent.as_bytes())?;
                             }
                             writer.write_all(&buf[n..n + 1])?;
-                        } else if self.depth == 0 {
+                        } else if !self.eager_record_separators && self.depth == 0 {
                             writer.write_all(self.record_separator.as_bytes())?;
                             writer.write_all(&buf[n..n + 1])?;
                         } else {
@@ -296,6 +301,9 @@ impl Formatter {
                                 writer.write_all(self.indent.as_bytes())?;
                             }
                             writer.write_all(&buf[n..n + 1])?;
+                        }
+                        if self.eager_record_separators && self.depth == 0 {
+                            writer.write_all(self.record_separator.as_bytes())?;
                         }
                     }
 

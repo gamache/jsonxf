@@ -56,3 +56,17 @@ fn pretty_print_passes_test_cases() {
         assert_eq!(jsonxf::pretty_print(input).unwrap(), output);
     }
 }
+
+#[test]
+fn eager_record_separators() {
+    let test_cases = vec![
+        ("{1: 1}{}", "{\n  1: 1\n}\n{}\n"),
+        ("{1: 1}{1: 1}", "{\n  1: 1\n}\n{\n  1: 1\n}\n"),
+        ("[]", "[]\n"),
+    ];
+    for (input, output) in test_cases {
+        let mut printer = jsonxf::Formatter::pretty_printer();
+        printer.eager_record_separators = true;
+        assert_eq!(printer.format(input).unwrap(), output);
+    }
+}
