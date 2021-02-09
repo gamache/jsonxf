@@ -22,6 +22,7 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Error;
+use std::io::ErrorKind;
 
 const BUF_SIZE: usize = 1024 * 16;
 
@@ -222,6 +223,9 @@ impl Formatter {
                 }
                 Ok(n) => {
                     self.format_buf(&buf[0..n], output)?;
+                }
+                Err(e) if e.kind() == ErrorKind::Interrupted => {
+                    continue;
                 }
                 Err(e) => {
                     return Err(e);
