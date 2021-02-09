@@ -186,26 +186,49 @@ impl Formatter {
     ) -> Result<(), Error> {
         let mut reader = BufReader::new(input);
         let mut writer = BufWriter::new(output);
+        return self.format_stream_unbuffered(&mut reader, &mut writer);
+    }
+
+    /// Formats a stream of JSON-encoded data without buffering.
+    ///
+    /// This will perform many small writes, so it's advisable to use an
+    /// output that does its own buffering. In simple cases, use
+    /// [`Formatter::format_stream`] instead.
+    ///
+    /// # Example:
+    ///
+    /// ```no_run
+    /// let mut fmt = jsonxf::Formatter::pretty_printer();
+    /// let mut stdin = std::io::stdin();
+    /// let mut stdout = std::io::stdout();
+    /// fmt.format_stream_unbuffered(&mut stdin, &mut std::io::LineWriter::new(stdout))
+    ///     .unwrap();
+    /// ```
+    pub fn format_stream_unbuffered(
+        &mut self,
+        input: &mut impl Read,
+        output: &mut impl Write,
+    ) -> Result<(), Error> {
         let mut buf = [0 as u8; BUF_SIZE];
         loop {
-            match reader.read(&mut buf) {
+            match input.read(&mut buf) {
                 Ok(0) => {
                     break;
                 }
                 Ok(n) => {
-                    self.format_buf(&buf[0..n], &mut writer)?;
+                    self.format_buf(&buf[0..n], output)?;
                 }
                 Err(e) => {
                     return Err(e);
                 }
             }
         }
-        writer.write_all(self.trailing_output.as_bytes())?;
+        output.write_all(self.trailing_output.as_bytes())?;
         return Ok(());
     }
 
     /* Formats the contents of `buf` into `writer`. */
-    fn format_buf(&mut self, buf: &[u8], writer: &mut dyn Write) -> Result<(), Error> {
+    fn format_buf(&mut self, buf: &[u8], writer: &mut impl Write) -> Result<(), Error> {
         for n in 0..buf.len() {
             let b = buf[n];
 
