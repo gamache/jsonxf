@@ -236,8 +236,17 @@ impl Formatter {
         return Ok(());
     }
 
-    /* Formats the contents of `buf` into `writer`. */
-    fn format_buf(&mut self, buf: &[u8], writer: &mut impl Write) -> Result<(), Error> {
+    /// Format directly from a buffer into a writer.
+    ///
+    /// # Example:
+    ///
+    /// ```no_run
+    /// let text = "[1, 2, 3]";
+    /// let mut fmt = jsonxf::Formatter::pretty_printer();
+    /// let mut stdout = std::io::stdout();
+    /// fmt.format_buf(text.as_bytes(), &mut stdout).unwrap();
+    /// ```
+    pub fn format_buf(&mut self, buf: &[u8], writer: &mut impl Write) -> Result<(), Error> {
         let mut n = 0;
         while n < buf.len() {
             let b = buf[n];
