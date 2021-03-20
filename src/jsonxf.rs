@@ -238,6 +238,10 @@ impl Formatter {
 
     /// Format directly from a buffer into a writer.
     ///
+    /// This may be called on chunks of a JSON document to format it bit by bit.
+    ///
+    /// As such, it does not add the `trailing_output` at the end.
+    ///
     /// # Example:
     ///
     /// ```no_run
