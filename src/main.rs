@@ -8,7 +8,7 @@
   Run `jsonxf -h` for usage options.
 */
 
-use std::fs::File;
+use std::{fs::File, io::ErrorKind};
 
 extern crate jsonxf;
 
@@ -150,6 +150,8 @@ fn do_main() -> Result<(), String> {
     } else {
         let mut xf = jsonxf::Formatter::pretty_printer();
         xf.indent = indent;
+        // Ensure a trailing newline, as expected on Unix
+        xf.eager_record_separators = true;
         xf.format_stream(&mut input, &mut output)
     };
 
@@ -159,6 +161,7 @@ fn do_main() -> Result<(), String> {
     }
 
     match result {
+        Err(e) if e.kind() == ErrorKind::BrokenPipe => Ok(()),
         Err(e) => Err(e.to_string()),
         Ok(_) => Ok(()),
     }
