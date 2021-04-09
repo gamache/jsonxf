@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 (2021-04-09)
+
+Added a huge pile of improvements documented in [the Github
+PR](https://github.com/gamache/jsonxf/pull/8). Thanks again,
+[@blyxxyz](https://github.com/blyxxyz)!
+
 ## 1.0.2 (2021-02-09)
 
 Fixed bug where an input of an unmatched closing bracket would
