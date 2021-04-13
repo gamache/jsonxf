@@ -89,14 +89,14 @@ fn do_main() -> Result<(), String> {
             }
         },
         Some(filename) => {
-            if filename == "-".to_owned() {
+            if filename == *"-" {
                 Box::new(std::io::stdin())
             } else {
                 input_filename = Some(String::from(&filename));
                 match File::open(&filename) {
                     Ok(f) => Box::new(f),
                     Err(e) => {
-                        let mut estr = String::from(filename);
+                        let mut estr = filename;
                         estr.push_str(": ");
                         estr.push_str(&e.to_string());
                         return Err(estr);
@@ -109,7 +109,7 @@ fn do_main() -> Result<(), String> {
     let mut output: Box<dyn std::io::Write> = match matches.opt_str("o") {
         None => Box::new(std::io::stdout()),
         Some(filename) => {
-            if filename == "-".to_owned() {
+            if filename == *"-" {
                 Box::new(std::io::stdout())
             } else {
                 let mut temp_filename = String::from(&filename);
@@ -129,7 +129,7 @@ fn do_main() -> Result<(), String> {
                 match File::create(&temp_filename) {
                     Ok(f) => Box::new(f),
                     Err(e) => {
-                        let mut estr = String::from(filename);
+                        let mut estr = filename;
                         estr.push_str(": ");
                         estr.push_str(&e.to_string());
                         return Err(estr);
@@ -141,7 +141,7 @@ fn do_main() -> Result<(), String> {
 
     let indent = match matches.opt_str("t") {
         None => String::from("  "),
-        Some(string) => string.clone(),
+        Some(string) => string,
     };
 
     let result = if matches.opt_present("m") {
@@ -167,7 +167,7 @@ fn do_main() -> Result<(), String> {
     }
 }
 
-fn print_help(program_name: &str, opts: &Options) -> () {
+fn print_help(program_name: &str, opts: &Options) {
     let desc = "Jsonxf is a JSON transformer.  It provides fast pretty-printing and
 minimizing of JSON-encoded UTF-8 data.";
 

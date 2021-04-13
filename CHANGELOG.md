@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2021-04-13)
+
+Cleaned up some syntax. Thanks, `cargo clippy`!
+
 ## 1.1.0 (2021-04-09)
 
 Added a huge pile of improvements documented in [the Github

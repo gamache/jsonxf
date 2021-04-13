@@ -5,6 +5,11 @@ A JSON transformer, written in Rust.
 Provides fast pretty-printing and minimizing of JSON-encoded strings
 and streams, at the command line or within Rust programs.
 
+Jsonxf is built for speed, and does not attempt to perform any
+input validation whatsoever.  Valid input produces valid output,
+but no guarantees are offered around the detection and rejection
+of invalid input.
+
 Crate docs: https://docs.rs/jsonxf/
 
 
