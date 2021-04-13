@@ -26,20 +26,20 @@ use std::io::ErrorKind;
 
 const BUF_SIZE: usize = 1024 * 16;
 
-const C_CR: u8 = '\r' as u8;
-const C_LF: u8 = '\n' as u8;
-const C_TAB: u8 = '\t' as u8;
-const C_SPACE: u8 = ' ' as u8;
+const C_CR: u8 = b'\r';
+const C_LF: u8 = b'\n';
+const C_TAB: u8 = b'\t';
+const C_SPACE: u8 = b' ';
 
-const C_COMMA: u8 = ',' as u8;
-const C_COLON: u8 = ':' as u8;
-const C_QUOTE: u8 = '"' as u8;
-const C_BACKSLASH: u8 = '\\' as u8;
+const C_COMMA: u8 = b',';
+const C_COLON: u8 = b':';
+const C_QUOTE: u8 = b'"';
+const C_BACKSLASH: u8 = b'\\';
 
-const C_LEFT_BRACE: u8 = '{' as u8;
-const C_LEFT_BRACKET: u8 = '[' as u8;
-const C_RIGHT_BRACE: u8 = '}' as u8;
-const C_RIGHT_BRACKET: u8 = ']' as u8;
+const C_LEFT_BRACE: u8 = b'{';
+const C_LEFT_BRACKET: u8 = b'[';
+const C_RIGHT_BRACE: u8 = b'}';
+const C_RIGHT_BRACKET: u8 = b']';
 
 /// `Formatter` allows customizable pretty-printing, minimizing,
 /// and other formatting tasks on JSON-encoded UTF-8 data in
@@ -113,7 +113,7 @@ impl Formatter {
     /// );
     /// ```
     pub fn pretty_printer() -> Formatter {
-        return Formatter::default();
+        Formatter::default()
     }
 
     /// Returns a Formatter set up for minimizing.
@@ -134,7 +134,7 @@ impl Formatter {
         xf.line_separator = String::from("");
         xf.record_separator = String::from("\n");
         xf.after_colon = String::from("");
-        return xf;
+        xf
     }
 
     /// Formats a string of JSON-encoded data.
@@ -167,7 +167,7 @@ impl Formatter {
                 return Err(f.to_string());
             }
         };
-        return Ok(output_string);
+        Ok(output_string)
     }
 
     /// Formats a stream of JSON-encoded data.
@@ -192,7 +192,7 @@ impl Formatter {
     ) -> Result<(), Error> {
         let mut reader = BufReader::new(input);
         let mut writer = BufWriter::new(output);
-        return self.format_stream_unbuffered(&mut reader, &mut writer);
+        self.format_stream_unbuffered(&mut reader, &mut writer)
     }
 
     /// Formats a stream of JSON-encoded data without buffering.
@@ -215,7 +215,7 @@ impl Formatter {
         input: &mut impl Read,
         output: &mut impl Write,
     ) -> Result<(), Error> {
-        let mut buf = [0 as u8; BUF_SIZE];
+        let mut buf = [0_u8; BUF_SIZE];
         loop {
             match input.read(&mut buf) {
                 Ok(0) => {
@@ -233,7 +233,7 @@ impl Formatter {
             }
         }
         output.write_all(self.trailing_output.as_bytes())?;
-        return Ok(());
+        Ok(())
     }
 
     /// Format directly from a buffer into a writer.
@@ -355,7 +355,7 @@ impl Formatter {
             n += 1;
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 
